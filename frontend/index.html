@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trekking Management Application</title>
+
+    <!-- Vue CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+          crossorigin="anonymous">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Days+One&display=swap" rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/frontend/css/main.css">
+
+    <!-- Components -->
+    <script src="/frontend/components/login_page.js"></script>
+    <script src="/frontend/components/register_page.js"></script>
+
+    <script src="/frontend/components/table_component.js"></script>
+    <script src="/frontend/components/stats_cards_component.js"></script>
+
+    <script src="/frontend/components/admin_layout.js"></script>
+    <script src="/frontend/components/admin_dashboard.js"></script>
+    <script src="/frontend/components/admin_treks.js"></script>
+    <script src="/frontend/components/admin_staff.js"></script>
+    <script src="/frontend/components/admin_users.js"></script>
+    <script src="/frontend/components/admin_add_trek.js"></script>
+    <script src="/frontend/components/admin_bookings.js"></script>
+
+    <script src="/frontend/components/staff_layout.js"></script>
+    <script src="/frontend/components/staff_dashboard.js"></script>
+    <script src="/frontend/components/staff_treks.js"></script>
+    <script src="/frontend/components/staff_participants.js"></script>
+    <script src="/frontend/components/staff_profile.js"></script>
+    <script src="/frontend/components/staff_manage_trek.js"></script>
+
+    <script src="/frontend/components/user_layout.js"></script>
+    <script src="/frontend/components/user_dashboard.js"></script>
+    <script src="/frontend/components/user_bookings.js"></script>
+    <script src="/frontend/components/user_treks.js"></script>
+    <script src="/frontend/components/user_trek_details.js"></script>
+    <script src="/frontend/components/user_history.js"></script>
+    <script src="/frontend/components/user_profile.js"></script>
+
+</head>
+
+<body>
+
+    <div id="app">
+        <component
+            :is="currentPageComponent"
+            :trek-id="selectedTrekId"
+            @navigate="handleNavigate"
+            @logout="logout"
+        ></component>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+
+            data() {
+                return {
+                    currentPage: 'login-page',
+                    selectedTrekId: null
+                };
+            },
+
+            computed: {
+                currentPageComponent() {
+
+                    const pages = {
+
+                        'login-page': window.LoginPage,
+
+                        'register-page': window.RegisterPage,
+
+                        'admin-dashboard': window.AdminDashboard,
+
+                        'admin-treks': window.AdminTreks,
+
+                        'admin-staff': window.AdminStaff,
+
+                        'admin-users': window.AdminUsers,
+
+                        'admin-add-trek': window.AdminAddTrek,
+
+                        'admin-edit-trek': window.AdminAddTrek,
+
+                        'admin-bookings': window.AdminBookings,
+
+                        'staff-dashboard': window.StaffDashboard,
+
+                        'staff-treks': window.StaffTreks,
+
+                        'staff-participants': window.StaffParticipants,
+
+                        'staff-manage-trek': window.StaffManageTrek,
+
+                        'staff-profile': window.StaffProfile,
+
+                        'user-dashboard': window.UserDashboard,
+
+                        'user-treks': window.UserTreks,
+
+                        'user-trek-details': window.UserTrekDetails,
+
+                        "user-history": window.UserHistory,
+
+                        'user-profile': window.UserProfile,
+
+                        'user-bookings': window.UserBookings
+
+                    };
+
+                    return pages[this.currentPage] || window.LoginPage;
+                }
+            },
+
+            methods: {
+
+                async checkAuth() {
+
+                    try {
+
+                        const response = await fetch('/api/auth/me', {
+                            credentials: 'include'
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+
+                            const role = result.data.role;
+
+                            if (role === 'admin') {
+                                this.currentPage = 'admin-dashboard';
+                            }
+                            else if (role === 'staff') {
+                                this.currentPage = 'staff-dashboard';
+                            }
+                            else {
+                                this.currentPage = 'user-dashboard';
+                            }
+                        }
+
+                    } catch (err) {
+
+                        console.error('Authentication check failed:', err);
+
+                    }
+
+                },
+
+                handleNavigate(page) {
+                    console.log("Navigating to:", page);
+                    console.log("selectedTrekId before navigation:", this.selectedTrekId);
+                    this.currentPage = page;
+                },
+
+                async logout() {
+                    this.currentPage = 'login-page';
+                }
+
+            },
+
+            mounted() {
+
+                this.checkAuth();
+
+            }
+
+        });
+
+        app.mount('#app');
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+
+</body>
+</html>
