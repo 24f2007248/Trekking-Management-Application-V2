@@ -5,8 +5,12 @@ import sqlalchemy as db
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, backref
 from sqlalchemy import Integer, String, Boolean, DateTime, Date, Text, ForeignKey, func, UniqueConstraint, Column, Table
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
-engine = db.create_engine("sqlite:///trekking.db")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "trekking.db")
+
+engine = db.create_engine(f"sqlite:///{DB_PATH}")
 
 class Base(DeclarativeBase):
     pass
